@@ -66,6 +66,10 @@ public class ProductDTO implements Serializable {
 	public String getName() {
 		return name;
 	}
+	
+	public String getDescription() {
+		return description;
+	}
 
 	public Double getPrice() {
 		return price;
