@@ -47,7 +47,7 @@ public class ProductService {
 
 		return new ProductDTO(entity);
 	}
-	
+
 	@Transactional
 	public ProductDTO update(Long id, ProductDTO dto) {
 		try {
@@ -55,21 +55,21 @@ public class ProductService {
 			copyDtoToEntity(dto, entity);
 			entity = productRepository.save(entity);
 			return new ProductDTO(entity);
-		} catch(EntityNotFoundException e) {
+		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Recurso não encontrado");
 		}
 	}
-	
+
 	@Transactional(propagation = Propagation.SUPPORTS)
 	public void delete(Long id) {
-		if(!productRepository.existsById(id)) {
+		if (!productRepository.existsById(id)) {
 			throw new ResourceNotFoundException("Recurso não encontrado");
 		}
 		try {
 			productRepository.deleteById(id);
 		}
-		
-		catch(DataIntegrityViolationException e) {
+
+		catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Falha de integridade referencial");
 		}
 	}
