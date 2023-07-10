@@ -18,20 +18,21 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_order")
-public class Order{
-	
+public class Order {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+
+	@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
 	private Instant moment;
 	private OrderStatus status;
-	
+
 	@OneToMany(mappedBy = "id.order")
 	private Set<OrderItem> items = new HashSet<>();
-	
-	public Order() {}
+
+	public Order() {
+	}
 
 	public Order(Long id, Instant moment, OrderStatus status) {
 		super();
@@ -63,12 +64,12 @@ public class Order{
 	public void setStatus(OrderStatus status) {
 		this.status = status;
 	}
-	
-	public Set<OrderItem> getItems(){
+
+	public Set<OrderItem> getItems() {
 		return items;
 	}
-	
-	public List<Product> getProducts(){
+
+	public List<Product> getProducts() {
 		return items.stream().map(x -> x.getProduct()).toList();
 	}
 
