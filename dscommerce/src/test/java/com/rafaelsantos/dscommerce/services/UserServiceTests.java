@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.rafaelsantos.dscommerce.entities.User;
+import com.rafaelsantos.dscommerce.entities.dto.UserDTO;
 import com.rafaelsantos.dscommerce.projections.UserDetailsProjection;
 import com.rafaelsantos.dscommerce.repositories.UserRepository;
 import com.rafaelsantos.dscommerce.tests.UserDetailsFactory;
@@ -85,6 +86,28 @@ public class UserServiceTests {
 
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
 			service.authenticated();
+		});
+	}
+
+	@Test
+	public void getMeShouldReturnUserDTOWhenUserIsAuthenticated() {
+		UserService spyUserService = Mockito.spy(service);
+		Mockito.doReturn(user).when(spyUserService).authenticated();
+
+		UserDTO result = spyUserService.getMe();
+
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(result.getEmail(), existingUsername);
+	}
+
+	@Test
+	public void getMeShouldReturnThrowResourceNotFoundExceptionWhenUserNotAuthenticated() {
+		UserService spyUserService = Mockito.spy(service);
+		Mockito.doThrow(UsernameNotFoundException.class).when(spyUserService).authenticated();
+
+		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
+			@SuppressWarnings("unused")
+			UserDTO result = spyUserService.getMe();
 		});
 	}
 }
