@@ -2,12 +2,9 @@ package com.rafaelsantos.dscommerce.services;
 
 import java.util.List;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +13,18 @@ import com.rafaelsantos.dscommerce.entities.User;
 import com.rafaelsantos.dscommerce.entities.dto.UserDTO;
 import com.rafaelsantos.dscommerce.projections.UserDetailsProjection;
 import com.rafaelsantos.dscommerce.repositories.UserRepository;
+import com.rafaelsantos.dscommerce.util.CustomUserUtil;
 
 @Service
 public class UserService implements UserDetailsService {
 
 	private UserRepository userRepository;
+	
+	private CustomUserUtil customUserUtil;
 
-	public UserService(UserRepository userRepository) {
+	public UserService(UserRepository userRepository, CustomUserUtil customUserUtil) {
 		this.userRepository = userRepository;
+		this.customUserUtil = customUserUtil;
 	}
 
 	@Override
@@ -45,9 +46,7 @@ public class UserService implements UserDetailsService {
 
 	protected User authenticated() {
 		try {
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-			String username = jwtPrincipal.getClaim("username");
+			String username = customUserUtil.getLoggedUsername();
 			return userRepository.findByEmail(username).get();
 		} catch (Exception e) {
 			throw new UsernameNotFoundException("Invalid user");
