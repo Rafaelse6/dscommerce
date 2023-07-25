@@ -75,6 +75,8 @@
 							com/rafaelsantos/dscommerce/DscommerceApplication.class</exclude>
 						<exclude>com/rafaelsantos/dscommerce/config/**</exclude>
 						<exclude>com/rafaelsantos/dscommerce/entities/**</exclude>
+						<exclude>com/rafaelsantos/dscommerce/util/**</exclude>
+						<exclude>com/rafaelsantos/dscommerce/controllers/**</exclude>
 						<exclude>com/rafaelsantos/dscommerce/dto/**</exclude>
 						<exclude>
 							com/rafaelsantos/dscommerce/controllers/handlers/**</exclude>
