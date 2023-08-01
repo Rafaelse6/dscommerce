@@ -113,6 +113,7 @@ public class OrderServiceTests {
 		Mockito.doThrow(ForbiddenException.class).when(authService).validateSelfOrAdmin(any());
 		
 		Assertions.assertThrows(ForbiddenException.class, () -> {
+			@SuppressWarnings("unused")
 			OrderDTO result = service.findById(existingOrderId);
 		});
 	}
@@ -122,6 +123,7 @@ public class OrderServiceTests {
 		Mockito.doNothing().when(authService).validateSelfOrAdmin(any());
 		
 		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			@SuppressWarnings("unused")
 			OrderDTO result = service.findById(nonExistingOrderId);
 		});
 	}

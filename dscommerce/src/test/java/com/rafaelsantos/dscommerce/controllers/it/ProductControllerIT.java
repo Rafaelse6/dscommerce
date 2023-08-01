@@ -13,9 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rafaelsantos.dscommerce.entities.Category;
 import com.rafaelsantos.dscommerce.entities.Product;
 import com.rafaelsantos.dscommerce.entities.dto.ProductDTO;
 import com.rafaelsantos.dscommerce.tests.TokenUtil;
@@ -38,6 +40,7 @@ public class ProductControllerIT {
 	private ProductDTO productDTO;
 	private Product product;
 	
+	
 	private String clientUsername, clientPassword, adminUsername, adminPassword;
 	private String clientToken, adminToken, invalidToken;
 	
@@ -49,6 +52,11 @@ public class ProductControllerIT {
 		adminUsername = "alex@gmail.com";
 		adminPassword = "123456";
 		
+		Category category = new Category(2L, "Electronics");
+		
+		product = new Product(null, "Playstation 5", "Lorem ipsum, dolor sit amet consectetur adipisicing elit.", 3999.90, "https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg");
+		product.getCategories().add(category);
+		productDTO = new ProductDTO(product);
 		productName = "Macbook";
 		
 		adminToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientPassword);
@@ -93,6 +101,16 @@ public class ProductControllerIT {
 				.perform(post("/products")
 						.header("Authorization", "Bearer " + adminToken)
 						.content(jsonBody)
-						.accept(MediaType.APPLICATION_JSON));
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON))
+						.andDo(MockMvcResultHandlers.print());
+		
+		result.andExpect(status().isCreated());
+		result.andExpect(jsonPath("$.id").value(26L));
+		result.andExpect(jsonPath("$.name").value("Playstation 5"));
+		result.andExpect(jsonPath("$.description").value("Lorem ipsum, dolor sit amet consectetur adipisicing elit."));
+		result.andExpect(jsonPath("$.price").value(3999.90));
+		result.andExpect(jsonPath("$.imgUrl").value("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg"));
+		result.andExpect(jsonPath("$.categories[0].id").value(2L));
 	}
 }
