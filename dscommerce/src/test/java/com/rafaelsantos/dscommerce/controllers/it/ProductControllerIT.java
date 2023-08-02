@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException.UnprocessableEntity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelsantos.dscommerce.entities.Category;
@@ -112,5 +113,96 @@ public class ProductControllerIT {
 		result.andExpect(jsonPath("$.price").value(3999.90));
 		result.andExpect(jsonPath("$.imgUrl").value("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/1-big.jpg"));
 		result.andExpect(jsonPath("$.categories[0].id").value(2L));
+	}
+	
+	@Test
+	public void insertShouldThrowUnprocessableEntityWhenAdmingLoggedAndInvalidName() throws Exception{
+		
+		product.setName("ab");
+		productDTO = new ProductDTO(product);
+		
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		ResultActions result = mockMvc
+				.perform(post("/products")
+						.header("Authorization", "Bearer " + adminToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isUnprocessableEntity());
+		
+	}
+	
+	@Test
+	public void insertShouldThrowUnprocessableEntityWhenAdmingLoggedAndInvalidDescription() throws Exception{
+		
+		product.setDescription("a");
+		productDTO = new ProductDTO(product);
+		
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		ResultActions result = mockMvc
+				.perform(post("/products")
+						.header("Authorization", "Bearer " + adminToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isUnprocessableEntity());
+	}
+	
+	@Test
+	public void insertShouldThrowUnprocessableEntityWhenAdmingLoggedAndNegativePrice() throws Exception{
+		
+		product.setPrice(-50.0);
+		productDTO = new ProductDTO(product);
+		
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		ResultActions result = mockMvc
+				.perform(post("/products")
+						.header("Authorization", "Bearer " + adminToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isUnprocessableEntity());
+	}
+	
+	@Test
+	public void insertShouldThrowUnprocessableEntityWhenAdmingLoggedAndPriceIsZero() throws Exception{
+		
+		product.setPrice(0.00);
+		productDTO = new ProductDTO(product);
+		
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		ResultActions result = mockMvc
+				.perform(post("/products")
+						.header("Authorization", "Bearer " + adminToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isUnprocessableEntity());
+	}
+	
+	@Test
+	public void insertShouldThrowUnprocessableEntityWhenAdmingLoggedAndProductHasNoCategory() throws Exception{
+		
+		product.getCategories().clear();
+		productDTO = new ProductDTO(product);
+		
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		ResultActions result = mockMvc
+				.perform(post("/products")
+						.header("Authorization", "Bearer " + adminToken)
+						.content(jsonBody)
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON));
+		
+		result.andExpect(status().isUnprocessableEntity());
 	}
 }
