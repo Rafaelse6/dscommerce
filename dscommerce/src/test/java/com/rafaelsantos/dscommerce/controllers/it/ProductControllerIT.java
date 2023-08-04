@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException.UnprocessableEntity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rafaelsantos.dscommerce.entities.Category;
@@ -60,7 +59,7 @@ public class ProductControllerIT {
 		productDTO = new ProductDTO(product);
 		productName = "Macbook";
 
-		adminToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientPassword);
+		clientToken = tokenUtil.obtainAccessToken(mockMvc, clientUsername, clientPassword);
 		adminToken = tokenUtil.obtainAccessToken(mockMvc, adminUsername, adminPassword);
 		invalidToken = adminToken + "xpto";
 	}
@@ -181,5 +180,26 @@ public class ProductControllerIT {
 				.content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
 
 		result.andExpect(status().isUnprocessableEntity());
+	}
+
+	@Test
+	public void insertShouldThrowForbiddenWhenClientLogged() throws Exception {
+
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+
+		ResultActions result = mockMvc.perform(post("/products").header("Authorization", "Bearer " + clientToken)
+				.content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+
+		result.andExpect(status().isForbidden());
+	}
+
+	@Test
+	public void insertShouldTReturnUnauthorizedWhenInvalidToken() throws Exception {
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+
+		ResultActions result = mockMvc.perform(post("/products").header("Authorization", "Bearer " + invalidToken)
+				.content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+
+		result.andExpect(status().isUnauthorized());
 	}
 }
